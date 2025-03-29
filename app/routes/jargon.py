@@ -7,7 +7,7 @@ router = APIRouter()
 @router.get("/bites/{feature}")
 def serve_bite(feature: str, subkey: str = None, fear: str = None):
     feature_bites = get_bite(feature)
-    print(f"Feature_bites: {feature_bites}")
+    # print(f"Feature_bites: {feature_bites}")
     
     if isinstance(feature_bites, str):
         return {"bite": f"{feature} is your easy money buddy—try it!"}
