@@ -6,6 +6,7 @@ class Challenge(SQLModel, table=True):
     employment_type: str
     financial_goal: str
     investment_preference: str
+    Monthly_income: float
     savings_rate: float
     spending_behavior: str
     debt_situation: str
