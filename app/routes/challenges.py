@@ -5,17 +5,16 @@ from app.models.models import Challenge
 from app.schema.schema import ChallengeCreate, ChallengeResponse
 from app.services.ollama_service.ollama_service import generate_challenge
 from datetime import datetime, timedelta
-import time
 from apscheduler.schedulers.background import BackgroundScheduler
+import requests
 
 router = APIRouter()
 scheduler = BackgroundScheduler()
 
 # Function to trigger nudges
 def trigger_nudge():
-    import requests  # Local import to avoid circular dependencies
     try:
-        response = requests.get("http://localhost:8000/trigger-nudge")
+        response = requests.get("http://localhost:8000/challenges/nudges/trigger")
         print("Nudge Triggered:", response.json())
     except Exception as e:
         print("Error triggering nudge:", e)
@@ -27,6 +26,9 @@ if not scheduler.running:
 
 @router.post("/", response_model=ChallengeResponse)
 def create_challenge(data: ChallengeCreate, session: Session = Depends(get_session)):
+    """
+    Create a new financial challenge.
+    """
     generated_text = generate_challenge(data)
     challenge = Challenge(**data.dict(), generated_challenge=generated_text)
     session.add(challenge)
@@ -36,6 +38,9 @@ def create_challenge(data: ChallengeCreate, session: Session = Depends(get_sessi
 
 @router.get("/{challenge_id}", response_model=ChallengeResponse)
 def get_challenge(challenge_id: int, session: Session = Depends(get_session)):
+    """
+    Retrieve a specific challenge by ID.
+    """
     challenge = session.exec(select(Challenge).where(Challenge.id == challenge_id)).first()
     if not challenge:
         return {"error": "Challenge not found"}
@@ -43,6 +48,9 @@ def get_challenge(challenge_id: int, session: Session = Depends(get_session)):
 
 @router.post("/update-progress/{challenge_id}")
 def update_progress(challenge_id: int, session: Session = Depends(get_session)):
+    """
+    Update the progress of an active challenge.
+    """
     challenge = session.exec(select(Challenge).where(Challenge.id == challenge_id)).first()
     if not challenge:
         return {"error": "Challenge not found"}
@@ -68,7 +76,11 @@ def update_progress(challenge_id: int, session: Session = Depends(get_session)):
         "status": challenge.status
     }
 
-def check_nudges(session: Session):
+@router.get("/nudges/check", response_model=dict)
+def check_nudges(session: Session = Depends(get_session)):
+    """
+    API endpoint to check inactive users and nudge them.
+    """
     nudge_threshold = datetime.utcnow() - timedelta(days=2)
 
     inactive_challenges = session.exec(
@@ -88,28 +100,11 @@ def check_nudges(session: Session):
     session.commit()
     return {"nudged_users": nudged_users}
 
-@router.get("/trigger-nudge")
-def trigger_nudge_endpoint(background_tasks: BackgroundTasks):
+@router.get("/nudges/trigger")
+def trigger_nudge_endpoint(background_tasks: BackgroundTasks, session: Session = Depends(get_session)):
     """
     API endpoint that manually triggers a nudge.
     Runs in the background to avoid blocking the request.
     """
-    background_tasks.add_task(check_nudges)
+    background_tasks.add_task(check_nudges, session)
     return {"message": "Nudge check triggered"}
-
-@router.get("/check-nudges", response_model=dict)
-def check_nudges_endpoint(session: Session = Depends(get_session)):
-    """
-    API endpoint to manually check and process nudges.
-    """
-    result = check_nudges(session)
-    return result
-
-from app.db.database import get_session
-
-def run_nudge_checker():
-    from app.routes.challenges import check_nudges  # Avoid circular imports
-    while True:
-        time.sleep(300)  # Wait 5 minutes
-        with next(get_session()) as session:
-            check_nudges(session=session)
