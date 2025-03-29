@@ -14,4 +14,7 @@ except (FileNotFoundError, json.JSONDecodeError, ValueError) as e:
     print(f"Error loading bites.json: {e}")
 
 def get_bite(feature: str) -> str:
+    print(f"Available keys: {list(BITES.keys())}")
+    print(f"Feature: {feature}")
+    print(f"Debugy: {BITES.get(feature)}")
     return BITES.get(feature, "No Jargon bite found")
