@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends
-from sqlmodel import Session, select
-from database import get_session
-from models import Challenge
-from schema import ChallengeCreate, ChallengeResponse
-from ollama_service import generate_challenge
+from fastapi import APIRouter, Depends # type: ignore
+from sqlmodel import Session, select # type: ignore
+from app.db.database import get_session
+from app.models.models import Challenge
+from app.schema.schema import ChallengeCreate, ChallengeResponse
+from app.services.ollama_service.ollama_service import generate_challenge
 from datetime import datetime, timedelta
 
 router = APIRouter()

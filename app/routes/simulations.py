@@ -1,29 +1,36 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
+import json
+from fastapi import FastAPI, APIRouter # type: ignore
+from app.services.simulations.sims import run_ideal_sim, run_real_sim
+
+with open("app/data/rates.json", "r") as f:
+    RATES = json.load(f)
 
 router = APIRouter()
 
-class SimulationRequest(BaseModel):
-    starting_amount: float
-    portfolio: str  # Options: digisave, eurobond
-
-class SimulationResponse(BaseModel):
-    one_year_savings: float
-    three_year_savings: float
-
-def calculate_simulation(starting_amount: float, portfolio: str):
-    if portfolio == "digisave":
-        rate = 0.08  # 8% per year
-    elif portfolio == "eurobond":
-        rate = 0.12  # 12% per year
-    else:
-        rate = 0.05  # Default rate
-
-    one_year = starting_amount * (1 + rate)
-    three_year = starting_amount * ((1 + rate) ** 3)
-    return one_year, three_year
-
-@router.post("/", response_model=SimulationResponse)
-def run_simulation(data: SimulationRequest):
-    one_year, three_year = calculate_simulation(data.starting_amount, data.portfolio)
-    return {"one_year_savings": one_year, "three_year_savings": three_year}
+@router.get("/sims/{fund}")
+def run_simulation(fund: str, amount: float, days: int = 30):
+    if fund not in RATES:
+        return {
+            "error": "Pick DigiSave, Eurobond, or GlobalTech!"
+        }
+    
+    # Validate days
+    valid_days = [7, 14, 30, 60, 90, 365]
+    if days not in valid_days:
+        days = min(valid_days, key=lambda x: abs(x - days))  # Closest match
+    
+    # Run sims
+    ideal = run_ideal_sim(amount, RATES[fund]["daily_rate"], days)
+    real = run_real_sim(amount, RATES[fund]["daily_rate"], RATES[fund]["volatility"], days)
+    diff = ideal[-1] - real[-1]
+    
+    return {
+        "fund": fund,
+        "amount": amount,
+        "days": days,
+        "ideal": {"values": ideal, "final": round(ideal[-1], 2)},
+        "real": {"values": real, "final": round(real[-1], 2)},
+        "difference": round(diff, 2),
+        "desc": "Ideal vs. Real—see how markets wiggle!"
+    }
+    ...

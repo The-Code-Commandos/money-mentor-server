@@ -1,0 +1,5 @@
+{
+    "DigiSave": {"daily_rate": 0.00046, "volatility": 0.0005},
+    "Eurobond": {"daily_rate": 0.00083, "volatility": 0.001},   
+    "GlobalTech": {"daily_rate": 0.00186, "volatility": 0.003}  
+}

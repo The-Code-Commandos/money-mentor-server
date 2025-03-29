@@ -1,5 +1,5 @@
-import ollama
-from schema import ChallengeCreate
+import ollama # type: ignore
+from app.schema.schema import ChallengeCreate
 
 SYSTEM_PROMPT = """You are an AI financial coach. Generate engaging, gamified savings and investment challenges based on user input. Keep it simple, actionable, and jargon-free. Do not include any disclaimers or legal information. Focus on the user's financial goals, preferences, and behaviors and queries given to you below. Anything out of the scope of the query should be ignored. The user is looking for a unique and engaging challenge that will help them achieve their financial goals."""
 

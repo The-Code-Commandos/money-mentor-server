@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field # type: ignore
 from datetime import datetime
 
 class Challenge(SQLModel, table=True):

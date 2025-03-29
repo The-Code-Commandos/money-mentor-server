@@ -1,0 +1,144 @@
+{
+    "DigiSave": {
+        "Main": {
+            "default": "A digital piggy bank you can open anytime—grows with interest!",
+            "loss": "A safe piggy bank—grab your money in a day if needed!"
+        },
+        "NoLockIn": {
+            "default": "Need cash? Get it in 24 hours—no waiting around!",
+            "loss": "No traps—your money’s free to take anytime!"
+        },
+        "PlusIncome": {
+            "default": "Your money joins a big pot that grows—experts watch it!",
+            "loss": "A safe money pot—pros keep it steady, not shrinking!"
+        },
+        "MutualFund": {
+            "default": "A big group piggy bank—experts grow it for you!",
+            "loss": "A shared safe—experts spread the risk so you don’t lose!"
+        },
+        "TreasuryBills": {
+            "default": "Lend to the government—they pay you back with extra!",
+            "loss": "Lend to the big guys—super safe, plus interest!"
+        },
+        "Return17": {
+            "default": "Put GHS 10 in, get GHS 11.71 back in a year!",
+            "loss": "Small, steady growth—no big risks, just GHS 1.71 extra!"
+        },
+        "SharePrice": {
+            "default": "What one piece of your money pot is worth today!",
+            "loss": "It wiggles daily but stays safe—don’t worry!"
+        },
+        "Fluctuations": {
+            "default": "Your money wiggles daily—normal for growing pots!",
+            "loss": "Wiggles happen but experts keep it safe—don’t panic!"
+        },
+        "AYTD": {
+            "default": "How much your money grew this year, stretched to 12 months!",
+            "loss": "Your growth so far—safe and steady all year!"
+        },
+        "FixedIncome": {
+            "default": "A money pot for steady growth—not wild swings!",
+            "loss": "A calm money pot—grows without big risks!"
+        }
+    },
+    "Eurobond": {
+        "Main": {
+            "default": "A money pot for big growth—experts grow it over years!",
+            "loss": "A safe pot for long-term wins—pros keep it steady!"
+        },
+        "UnitTrust": {
+            "default": "A group piggy bank—everyone chips in, experts grow it!",
+            "loss": "A shared safe—experts spread risks so you don’t lose!"
+        },
+        "USDSecurities": {
+            "default": "Lend dollars to big players—earn more in dollars!",
+            "loss": "Safe dollar lending—big names pay you back!"
+        },
+        "CapitalGains": {
+            "default": "Buy low, sell high—your money grows that way!",
+            "loss": "Prices wiggle but grow long-term—no big losses!"
+        },
+        "Compounding": {
+            "default": "Money grows on money—wait longer, win bigger!",
+            "loss": "Safe growth over years—time’s your friend, not foe!"
+        },
+        "LongTerm": {
+            "default": "Stick with it—your money grows more over time!",
+            "loss": "Wait it out—safe growth beats quick losses!"
+        },
+        "WithdrawalFees": {
+            "default": "Pull out early, pay a bit—or wait, it’s free!",
+            "loss": "No fees on Achieve—your money stays yours!"
+        },
+        "InterestRateRisk": {
+            "default": "Rates wiggle prices—normal, experts balance it out!",
+            "loss": "Prices may dip but pros keep it safe—don’t sweat!"
+        },
+        "TopUps": {
+            "default": "Add more cash—grows bigger, costs less over time!",
+            "loss": "Top up slow—safe way to grow, not lose!"
+        },
+        "Return15": {
+            "default": "GHC 500 a month turns into millions in 30 years!",
+            "loss": "Slow, safe growth—millions without big risks!"
+        }
+    },
+    "GlobalTech": {
+        "Main": {
+            "default": "A money pot betting big on tech—grows fast over years!",
+            "loss": "A bold tech pot—experts keep risks in check!"
+        },
+        "EquityFund": {
+            "default": "A group piggy bank for tech stocks—experts run it!",
+            "loss": "A shared safe for tech—risks spread, not scary!"
+        },
+        "GlobalEquities": {
+            "default": "Owning pieces of big companies worldwide—tech leads the way!",
+            "loss": "Tech stocks globally—diverse so one flop won’t hurt!"
+        },
+        "CapitalGains": {
+            "default": "Buy cheap, sell high—your money grows with tech!",
+            "loss": "Prices bounce but climb long-term—no big losses!"
+        },
+        "Dividends": {
+            "default": "Tech companies share profits—extra cash or more shares!",
+            "loss": "Free bonuses from tech—safe little wins!"
+        },
+        "Return68": {
+            "default": "GHS 100 last year grew to GHS 168—tech rocks!",
+            "loss": "Big growth, some wiggles—still safe long-term!"
+        },
+        "Volatility": {
+            "default": "Tech prices jump around—normal for big growth!",
+            "loss": "Wiggles happen—experts balance it, you’re fine!"
+        },
+        "Diversification": {
+            "default": "Lots of stocks—one flops, others save the day!",
+            "loss": "Spread out—keeps your money safer from crashes!"
+        },
+        "LongTerm": {
+            "default": "Wait it out—tech turns small cash into big piles!",
+            "loss": "Stick with it—safe growth beats quick losses!"
+        },
+        "AppLock": {
+            "default": "Locks you in 6 months—helps your money grow!",
+            "loss": "No quick pulls—keeps your cash safe to grow!"
+        },
+        "Stocks": {
+        "default": "Tiny slices of big companies—own a piece, watch it grow!",
+        "loss": "Bits of companies—experts pick safe ones so you don’t lose!"
+    },
+    "AYTD": {
+        "default": "How much your money grew this year, stretched to 12 months!",
+        "loss": "Your growth so far—safe and steady all year!"
+    },
+    "DailyChange": {
+        "default": "Your money’s up or down today—normal little wiggles!",
+        "loss": "Daily shifts happen—still safe, no big drops!"
+    },
+    "SharePrice": {
+        "default": "What one piece of your money pot costs today!",
+        "loss": "Price moves daily but stays safe—don’t worry!"
+    }
+    }
+}

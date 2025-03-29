@@ -1,1 +1,3 @@
 .qodo
+__init__.py
+__pycache__/
