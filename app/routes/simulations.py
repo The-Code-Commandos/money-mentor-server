@@ -34,7 +34,8 @@ def run_simulation(
     if deposit_min and deposit_max and deposit_min <= deposit_max:
         real = run_real_sim_range(amount, RATES[fund]["daily_rate"], RATES[fund]["volatility"], days, deposit_min, deposit_max, freq_days)
     else:
-        real = run_real_sim(amount, RATES[fund]["daily_rate"], RATES[fund]["volatility"], days, deposit, freq_days)
+        if deposit_min and deposit_max and deposit_min <= deposit_max and deposit_min > 0:
+            real = run_real_sim(amount, RATES[fund]["daily_rate"], RATES[fund]["volatility"], days, deposit, freq_days)
     diff = ideal[-1] - real[-1]
 
     return {
