@@ -60,10 +60,10 @@ def update_progress(challenge_id: int, session: Session = Depends(get_session)):
     
     # Calculate progress increment based on financial goal and duration
     try:
-        # Parse financial goal - handle both string and float
+        # Ensure financial_goal is a number
         if isinstance(challenge.financial_goal, str):
             # Remove currency symbol and convert to float
-            financial_goal = float(challenge.financial_goal.replace("GH₵", "").strip())
+            financial_goal = float(challenge.financial_goal.replace("GH₵", "").replace(",", "").strip())
         else:
             financial_goal = float(challenge.financial_goal)
         
@@ -71,33 +71,44 @@ def update_progress(challenge_id: int, session: Session = Depends(get_session)):
         if challenge.challenge_duration <= 0:
             return {"error": "Invalid challenge duration"}
             
+        # Calculate daily increment
         increment = financial_goal / challenge.challenge_duration
     except (ValueError, AttributeError):
-        # Default increment if financial_goal can't be parsed
-        if challenge.challenge_duration <= 0:
-            return {"error": "Invalid challenge duration"}
-        increment = 100 / challenge.challenge_duration
+        # Default increment if parsing fails
+        increment = 10  # Set a reasonable default
     
-    # Update progress - keep as float for more accurate tracking
-    new_progress = challenge.progress + increment
-    challenge.progress = new_progress  # Store as float
+    # Ensure progress is a float
+    current_progress = float(challenge.progress) if challenge.progress is not None else 0.0
+    
+    # Update progress as float (avoid int conversion)
+    new_progress = current_progress + increment
+    challenge.progress = new_progress
     challenge.last_updated = datetime.utcnow()
-    challenge.nudged = False  # Reset nudge flag since the user is active
+    challenge.nudged = False
     
     # Mark as completed if progress reaches or exceeds goal
     if new_progress >= financial_goal:
         challenge.status = "completed"
-        challenge.progress = financial_goal  # Cap at goal
+        challenge.progress = financial_goal
     
-    session.add(challenge)
-    session.commit()
-    
-    return {
-        "message": "Progress updated",
-        "progress": challenge.progress,
-        "status": challenge.status
-    }
-    
+    # Explicit commit
+    try:
+        session.add(challenge)
+        session.commit()
+        
+        # Return exact values for debugging
+        return {
+            "message": "Progress updated",
+            "progress": challenge.progress,
+            "status": challenge.status,
+            "increment": increment,
+            "previous_progress": current_progress,
+            "financial_goal": financial_goal
+        }
+    except Exception as e:
+        session.rollback()
+        return {"error": f"Failed to update progress: {str(e)}"}
+        
 @router.get("/nudges/check", response_model=dict)
 def check_nudges(session: Session = Depends(get_session)):
     """
