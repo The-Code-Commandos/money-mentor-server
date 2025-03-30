@@ -7,6 +7,7 @@ from app.services.ollama_service.ollama_service import generate_challenge
 from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
+from pydantic import BaseModel
 
 router = APIRouter()
 scheduler = BackgroundScheduler()
@@ -35,6 +36,14 @@ def create_challenge(data: ChallengeCreate, session: Session = Depends(get_sessi
     session.commit()
     session.refresh(challenge)
     return challenge
+
+@router.get("/", response_model=list[ChallengeResponse])
+def get_all_challenges(session: Session = Depends(get_session)):
+    """
+    Retrieve all challenges.
+    """
+    challenges = session.exec(select(Challenge)).all()
+    return challenges
 
 @router.get("/{challenge_id}", response_model=ChallengeResponse)
 def get_challenge(challenge_id: int, session: Session = Depends(get_session)):
@@ -76,10 +85,13 @@ def update_progress(challenge_id: int, session: Session = Depends(get_session)):
         "status": challenge.status
     }
 
-@router.get("/nudges/check", response_model=dict)
+class NudgeResponse(BaseModel):
+    nudged_users: list[int]
+
+@router.get("/nudges/check", response_model=NudgeResponse)
 def check_nudges(session: Session = Depends(get_session)):
     """
-    API endpoint to check inactive users and nudge them.
+    Check inactive users and nudge them.
     """
     nudge_threshold = datetime.utcnow() - timedelta(days=2)
 
@@ -98,7 +110,7 @@ def check_nudges(session: Session = Depends(get_session)):
         session.add(challenge)
 
     session.commit()
-    return {"nudged_users": nudged_users}
+    return NudgeResponse(nudged_users=nudged_users)
 
 @router.get("/nudges/trigger")
 def trigger_nudge_endpoint(background_tasks: BackgroundTasks, session: Session = Depends(get_session)):
