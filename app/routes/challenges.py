@@ -63,17 +63,40 @@ def update_progress(challenge_id: int, session: Session = Depends(get_session)):
     challenge = session.exec(select(Challenge).where(Challenge.id == challenge_id)).first()
     if not challenge:
         return {"error": "Challenge not found"}
-
+    
     if challenge.status == "completed":
-        return {"message": "Challenge already completed"}
-
-    # Update progress
-    challenge.progress += 1
+        return {"message": "Challenge already completed", "progress": challenge.progress, "status": challenge.status}
+    
+    # Calculate progress increment based on financial goal and duration
+    try:
+        # Ensure financial_goal is a number
+        if isinstance(challenge.financial_goal, str):
+            # Remove currency symbol and convert to float
+            financial_goal = float(challenge.financial_goal.replace("GH₵", "").replace(",", "").strip())
+        else:
+            financial_goal = float(challenge.financial_goal)
+        
+        # Guard against division by zero
+        if challenge.challenge_duration <= 0:
+            return {"error": "Invalid challenge duration"}
+            
+        # Calculate daily increment
+        increment = financial_goal / challenge.challenge_duration
+    except (ValueError, AttributeError):
+        # Default increment if parsing fails
+        increment = 10  # Set a reasonable default
+    
+    # Ensure progress is a float
+    current_progress = float(challenge.progress) if challenge.progress is not None else 0.0
+    
+    # Update progress as float (avoid int conversion)
+    new_progress = current_progress + increment
+    challenge.progress = new_progress
     challenge.last_updated = datetime.utcnow()
-    challenge.nudged = False  # Reset nudge flag since the user is active
-
-    # Mark as completed if progress reaches duration
-    if challenge.progress >= challenge.challenge_duration:
+    challenge.nudged = False
+    
+    # Mark as completed if progress reaches or exceeds goal
+    if new_progress >= financial_goal:
         challenge.status = "completed"
 
     session.add(challenge)
@@ -85,10 +108,7 @@ def update_progress(challenge_id: int, session: Session = Depends(get_session)):
         "status": challenge.status
     }
 
-class NudgeResponse(BaseModel):
-    nudged_users: list[int]
-
-@router.get("/nudges/check", response_model=NudgeResponse)
+@router.get("/nudges/check", response_model=dict)
 def check_nudges(session: Session = Depends(get_session)):
     """
     Check inactive users and nudge them.
@@ -110,7 +130,7 @@ def check_nudges(session: Session = Depends(get_session)):
         session.add(challenge)
 
     session.commit()
-    return NudgeResponse(nudged_users=nudged_users)
+    return(nudged_users=nudged_users)
 
 @router.get("/nudges/trigger")
 def trigger_nudge_endpoint(background_tasks: BackgroundTasks, session: Session = Depends(get_session)):
