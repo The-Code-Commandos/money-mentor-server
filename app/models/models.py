@@ -15,7 +15,7 @@ class Challenge(SQLModel, table=True):
     commitment_level: str
     financial_fear: str
     generated_challenge: str
-    progress: int = Field(default=0)  
+    progress: float = Field(default=0.0)  
     status: str = Field(default="active")  # "active" or "completed"
     last_updated: datetime = Field(default_factory=datetime.utcnow)  # Track last progress update
     nudged: bool = Field(default=False)  # Track if a nudge has been sent

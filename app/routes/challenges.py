@@ -54,25 +54,43 @@ def update_progress(challenge_id: int, session: Session = Depends(get_session)):
     challenge = session.exec(select(Challenge).where(Challenge.id == challenge_id)).first()
     if not challenge:
         return {"error": "Challenge not found"}
-
+    
     if challenge.status == "completed":
-        return {"message": "Challenge already completed"}
-
-    # Update progress
-    challenge.progress += 1
+        return {"message": "Challenge already completed", "progress": challenge.progress, "status": challenge.status}
+    
+    # Calculate progress increment based on financial goal and duration
+    try:
+        # Parse financial goal - remove currency symbol and convert to float
+        financial_goal = float(challenge.financial_goal.replace("GH₵", "").strip()) if isinstance(challenge.financial_goal, str) else challenge.financial_goal
+        
+        # Guard against division by zero
+        if challenge.challenge_duration <= 0:
+            return {"error": "Invalid challenge duration"}
+            
+        increment = financial_goal / challenge.challenge_duration
+    except (ValueError, AttributeError):
+        # Default increment if financial_goal can't be parsed
+        if challenge.challenge_duration <= 0:
+            return {"error": "Invalid challenge duration"}
+        increment = 100 / challenge.challenge_duration
+    
+    # Update progress - use float internally but store as integer in database
+    new_progress = challenge.progress + increment
+    challenge.progress = int(new_progress)  # Convert to int for storage
     challenge.last_updated = datetime.utcnow()
     challenge.nudged = False  # Reset nudge flag since the user is active
-
-    # Mark as completed if progress reaches duration
-    if challenge.progress >= challenge.challenge_duration:
+    
+    # Mark as completed if progress reaches or exceeds goal
+    if new_progress >= financial_goal:
         challenge.status = "completed"
-
+        challenge.progress = int(financial_goal)  # Cap at goal, convert to int
+    
     session.add(challenge)
     session.commit()
-
+    
     return {
         "message": "Progress updated",
-        "progress": f"{challenge.progress}/{challenge.challenge_duration} days",
+        "progress": challenge.progress,
         "status": challenge.status
     }
 
