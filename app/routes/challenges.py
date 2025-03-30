@@ -60,8 +60,12 @@ def update_progress(challenge_id: int, session: Session = Depends(get_session)):
     
     # Calculate progress increment based on financial goal and duration
     try:
-        # Parse financial goal - remove currency symbol and convert to float
-        financial_goal = float(challenge.financial_goal.replace("GH₵", "").strip()) if isinstance(challenge.financial_goal, str) else challenge.financial_goal
+        # Parse financial goal - handle both string and float
+        if isinstance(challenge.financial_goal, str):
+            # Remove currency symbol and convert to float
+            financial_goal = float(challenge.financial_goal.replace("GH₵", "").strip())
+        else:
+            financial_goal = float(challenge.financial_goal)
         
         # Guard against division by zero
         if challenge.challenge_duration <= 0:
@@ -74,16 +78,16 @@ def update_progress(challenge_id: int, session: Session = Depends(get_session)):
             return {"error": "Invalid challenge duration"}
         increment = 100 / challenge.challenge_duration
     
-    # Update progress - use float internally but store as integer in database
+    # Update progress - keep as float for more accurate tracking
     new_progress = challenge.progress + increment
-    challenge.progress = int(new_progress)  # Convert to int for storage
+    challenge.progress = new_progress  # Store as float
     challenge.last_updated = datetime.utcnow()
     challenge.nudged = False  # Reset nudge flag since the user is active
     
     # Mark as completed if progress reaches or exceeds goal
     if new_progress >= financial_goal:
         challenge.status = "completed"
-        challenge.progress = int(financial_goal)  # Cap at goal, convert to int
+        challenge.progress = financial_goal  # Cap at goal
     
     session.add(challenge)
     session.commit()
@@ -93,7 +97,7 @@ def update_progress(challenge_id: int, session: Session = Depends(get_session)):
         "progress": challenge.progress,
         "status": challenge.status
     }
-
+    
 @router.get("/nudges/check", response_model=dict)
 def check_nudges(session: Session = Depends(get_session)):
     """

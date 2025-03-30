@@ -4,7 +4,7 @@ from datetime import datetime
 class Challenge(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     employment_type: str
-    financial_goal: str
+    financial_goal: str  # Keep as string for flexibility
     investment_preference: str
     Monthly_income: float
     savings_rate: float
@@ -15,7 +15,8 @@ class Challenge(SQLModel, table=True):
     commitment_level: str
     financial_fear: str
     generated_challenge: str
-    progress: float = Field(default=0.0)  
+    progress: float = Field(default=0.0)  # Keep as float for accuracy
     status: str = Field(default="active")  # "active" or "completed"
-    last_updated: datetime = Field(default_factory=datetime.utcnow)  # Track last progress update
-    nudged: bool = Field(default=False)  # Track if a nudge has been sent
+    created_at: datetime = Field(default_factory=datetime.utcnow)  # Add this field
+    last_updated: datetime = Field(default_factory=datetime.utcnow)
+    nudged: bool = Field(default=False)
