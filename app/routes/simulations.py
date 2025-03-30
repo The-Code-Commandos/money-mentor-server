@@ -31,11 +31,16 @@ def run_simulation(
 
     # Run sims
     ideal = run_ideal_sim(amount, RATES[fund]["daily_rate"], days, deposit, freq_days)
+
+    # Ensure `real` is always assigned
     if deposit_min and deposit_max and deposit_min <= deposit_max:
         real = run_real_sim_range(amount, RATES[fund]["daily_rate"], RATES[fund]["volatility"], days, deposit_min, deposit_max, freq_days)
+    elif deposit > 0:
+        real = run_real_sim(amount, RATES[fund]["daily_rate"], RATES[fund]["volatility"], days, deposit, freq_days)
     else:
-        if deposit_min and deposit_max and deposit_min <= deposit_max and deposit_min > 0:
-            real = run_real_sim(amount, RATES[fund]["daily_rate"], RATES[fund]["volatility"], days, deposit, freq_days)
+        real = ideal  # Default to `ideal` if no valid `real` simulation can be run
+
+    # Calculate the difference
     diff = ideal[-1] - real[-1]
 
     return {
