@@ -6,6 +6,8 @@ from app.db.database import create_db_and_tables
 from app.routes.challenges import check_nudges
 import time
 import threading
+from app.db.database import get_session
+from sqlmodel import Session
 
 app = FastAPI(title="Financial Confidence Coach API", version="1.0")
 
@@ -19,6 +21,8 @@ def on_startup():
     threading.Thread(target=run_nudge_checker, daemon=True).start()
 
 def run_nudge_checker():
+    from app.routes.challenges import check_nudges  # Import here to avoid circular imports
     while True:
         time.sleep(300)  # Wait 5 minutes
-        check_nudges()
+        with next(get_session()) as session:  # Manually create a session
+            check_nudges(session=session)
