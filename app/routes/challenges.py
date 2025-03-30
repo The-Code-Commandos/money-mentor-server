@@ -12,6 +12,9 @@ from pydantic import BaseModel
 router = APIRouter()
 scheduler = BackgroundScheduler()
 
+class NudgeResponse(BaseModel):
+    nudged_users: list[int]
+
 # Function to trigger nudges
 def trigger_nudge():
     try:
@@ -108,7 +111,7 @@ def update_progress(challenge_id: int, session: Session = Depends(get_session)):
         "status": challenge.status
     }
 
-@router.get("/nudges/check", response_model=dict)
+@router.get("/nudges/check", response_model=NudgeResponse)
 def check_nudges(session: Session = Depends(get_session)):
     """
     Check inactive users and nudge them.
@@ -130,7 +133,7 @@ def check_nudges(session: Session = Depends(get_session)):
         session.add(challenge)
 
     session.commit()
-    return(nudged_users=nudged_users)
+    return NudgeResponse(nudged_users=nudged_users)
 
 @router.get("/nudges/trigger")
 def trigger_nudge_endpoint(background_tasks: BackgroundTasks, session: Session = Depends(get_session)):
