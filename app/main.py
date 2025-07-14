@@ -1,4 +1,5 @@
 from fastapi import FastAPI, BackgroundTasks # type: ignore
+from fastapi.middleware.cors import CORSMiddleware
 from app.routes.challenges import router as challenge_router
 from app.routes.simulations import router as simulation_router
 from app.routes.jargon import router as jargon_router
@@ -10,6 +11,14 @@ from app.db.database import get_session
 from sqlmodel import Session
 
 app = FastAPI(title="Financial Confidence Coach API", version="1.0")
+
+app.add_middleware(
+	CORSMiddleware,
+	allow_origins=["*"],
+	allow_credentials=True,
+	allow_methods=["*"],
+	allow_headers=["*"]
+)
 
 app.include_router(challenge_router, prefix="/challenges", tags=["Challenges"])
 app.include_router(simulation_router, prefix="/simulations", tags=["Simulations"])
